@@ -1,7 +1,7 @@
 # javascript-pagination
 
 
-This small and highly customizable Javascript library uses JQuery to economically display an array of items, including descriptions and images using:
+This small and highly customizable Javascript library uses JQuery to economically display an array of items, including descriptions and images, using:
 
 * Pagination
 * Filters
