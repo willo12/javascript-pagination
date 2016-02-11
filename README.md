@@ -21,6 +21,7 @@ For instance, in a Django template:
     <script src="{% static "js/products.js" %}"> </script>
 ```
 
+HTML elements have [Bootstrap](http://getbootstrap.com/) classes by default, but can be customized.
 
 To display the items, which are referred to as products in the library, include the following ```div``` at the location where you want to display the items in your HTML page:
 
