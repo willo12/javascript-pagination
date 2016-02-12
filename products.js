@@ -637,15 +637,42 @@ ProductDisplay.prototype = {
     },
 
 
+    create_or_replace : function (tag,el_class, prepend=false, attach_to = this.div){
+        // search on the first class, and replace if it exists, create otherwise
+        var i;
+        var first_class = el_class.split(" ")[0];
 
+        var finder = [tag,first_class].join('.');
+
+        var elements = attach_to.find(finder);
+
+        if ( elements.length>0  ){
+            elements.empty();
+            return elements.eq(0);
+        }
+        else{
+            var $element = $("<"+tag+">", {class: el_class});
+
+            if (prepend){            
+                attach_to.prepend($element);
+            }
+            else{
+                attach_to.append($element);
+            }
+
+            return $element;
+        }
+    },
 
 
     jquery : function (pg) {
         // DOM display method for ProductDisplay
  
         var i;
-        var row_paginator = $('<div class="row paginator"></div>');
-        var row_sorter = $('<div class="row sorter"></div>'); // for the sorter, filters and possibly messages
+ 
+//        var row_sorter = $('<div class="row sorter"></div>'); // for the sorter, filters and possibly messages
+
+        var row_filters = $(`<div class="row-filters"></div>`);
         var ul;
         var list_el;
 
@@ -655,31 +682,24 @@ ProductDisplay.prototype = {
 
 //console.log(this.div.find(".paginator:first").attr("class"));
 
-        if ( this.div.find(".paginator").length>0  ){
-            this.div.find(".paginator").remove();
-        }
 
-        this.div.append(row_paginator);
-
-       
-        if ( this.div.find(".sorter").length>0  ){
-            this.div.find(".sorter").remove();
-        }
+        var row_paginator = this.create_or_replace("div", "paginator row");
+ 
 
         if ( ('sorter' in this.layout) && (this.layout['sorter'] != 'none') ){
             
             if (this.layout['sorter'] == 'top'){ 
-                this.div.prepend(row_sorter);
+
+                var row_sorter = this.create_or_replace("div", "sorter row", true);
             }
             else if (this.layout['sorter'] == 'bottom'){ 
-                this.div.append(row_sorter);
+                var row_sorter = this.create_or_replace("div", "sorter row");
             }
             else if (this.layout['sorter'] != 'none'){ 
-                $(this.layout['sorter']).append(row_sorter);
+                var row_sorter = this.create_or_replace("div", "sorter row", false, $(this.layout['sorter']));
             }
         }
 
-        
 
 
         // Append objects to DOM 
@@ -822,10 +842,19 @@ ProductDisplay.prototype = {
         }
 
 
-
-
         if ( ('filters' in this.layout) && (this.layout['filters'] != 'none') ){
 //            var dropdown = new Selector(this,form_class="product-sorting",type="checkbox", label='Sort by',act_on="array",action="change");
+
+            if (this.layout['filters'] == 'top'){ 
+
+                var row_filter = this.create_or_replace("div", "filter_select row", true);
+            }
+            else if (this.layout['filters'] == 'bottom'){ 
+                var row_filter = this.create_or_replace("div", "filter_select row");
+            }
+            else if (this.layout['filters'] != 'none'){ 
+                var row_filter = this.create_or_replace("div", "filter_select row", false, $(this.layout['filter']));
+            }
 
             dropdown = new Selector(this,form_class="filters",type="dropdown", label='Price',act_on="array");
      
@@ -837,7 +866,7 @@ ProductDisplay.prototype = {
 
             dropdown.add('Price < 40', function (){that.add_filter('Price < 40', function (p) { return (parseInt(p.price)<40);} );that.refresh();} );
 
-                row_sorter.prepend(dropdown.display(that));           
+                row_filter.prepend(dropdown.display(that));           
 
         }
 
@@ -1012,7 +1041,7 @@ ProductDisplay.prototype = {
 
 function ProductDisplay(domEl, arr,  layout = {'buttons':{'loc':'paginate','type':'text'}, 
                                           'paginate':{'loc':'bottom','type':'list-inline'},
-                                          'sorter' : 'top', 'filters' : 'side'
+                                          'sorter' : 'bottom', 'filters' : 'top'
                                            }) {
     /* Product placeholder object
        Contains an array of productHolder elements under attribute "objects".
